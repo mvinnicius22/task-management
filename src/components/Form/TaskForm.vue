@@ -11,12 +11,14 @@
                 height="42"
                 flat
             >   
-                <p class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Tarefa {{ taskId }}</p>
+                <p v-if="taskId" class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Tarefa {{ taskId }}</p>
+                <p v-else class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Nova tarefa</p>
+
                 <v-spacer></v-spacer>
                 <v-btn
                     icon
                     color="blue darken-1"
-                    @click="dialog = false"
+                    @click="close"
                 >
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
@@ -108,62 +110,65 @@
                 </v-btn>
             </v-card-actions>
 
-            <v-divider></v-divider>
 
-            <v-row v-if="showCommentField" class="pt-3 pb-0 pl-3 pr-3">
-                <v-col cols="12">
-                    <v-textarea
-                        filled
-                        rows="2"
-                        auto-grow
-                        label="Adicionar comentário"
-                        v-model="comentario"
-                        hide-details
-                    ></v-textarea>        
-                </v-col>
-            </v-row>
+            <template v-if="taskId">
+                <v-divider></v-divider>
 
-            <v-card-actions v-if="showCommentField">
-            <v-spacer></v-spacer>
-                <v-btn
-                    text
-                    color="grey"
-                    @click="toggleCommentField"
-                >
-                    Cancelar
-                </v-btn>
-                <v-btn
-                    text
-                    color="blue darken-1"
-                    @click="saveComment"
-                >
-                    Postar
-                </v-btn>
-            </v-card-actions>
+                <v-row v-if="showCommentField" class="pt-3 pb-0 pl-3 pr-3">
+                    <v-col cols="12">
+                        <v-textarea
+                            filled
+                            rows="2"
+                            auto-grow
+                            label="Adicionar comentário"
+                            v-model="comentario"
+                            hide-details
+                        ></v-textarea>        
+                    </v-col>
+                </v-row>
 
-            <v-row class="p-3 pb-0">
-                <div class="pl-3 pr-3 py-2">
-                    <p class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Comentários</p>
-                </div>
+                <v-card-actions v-if="showCommentField">
                 <v-spacer></v-spacer>
-                <v-card-actions v-if="!showCommentField">
+                    <v-btn
+                        text
+                        color="grey"
+                        @click="toggleCommentField"
+                    >
+                        Cancelar
+                    </v-btn>
                     <v-btn
                         text
                         color="blue darken-1"
-                        @click="toggleCommentField"
+                        @click="saveComment"
                     >
-                        <v-icon
-                            left
-                            dark
-                        >
-                            mdi-plus
-                        </v-icon>
-                        Novo comentário
+                        Postar
                     </v-btn>
                 </v-card-actions>
-            </v-row>
 
-            <comment-list />
+                <v-row class="p-3 pb-0">
+                    <div class="pl-3 pr-3 py-2">
+                        <p class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Comentários</p>
+                    </div>
+                    <v-spacer></v-spacer>
+                    <v-card-actions v-if="!showCommentField">
+                        <v-btn
+                            text
+                            color="blue darken-1"
+                            @click="toggleCommentField"
+                        >
+                            <v-icon
+                                left
+                                dark
+                            >
+                                mdi-plus
+                            </v-icon>
+                            Novo comentário
+                        </v-btn>
+                    </v-card-actions>
+                </v-row>
+
+                <comment-list />
+            </template>
         </v-card>
     </v-dialog>
 </template>

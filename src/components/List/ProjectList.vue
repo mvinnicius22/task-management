@@ -27,7 +27,7 @@
                         <span class='ma-0 text-sm text-gray-600'>{{ item.artist }}</span>
                     </v-col>
                 </v-row>
-                <v-card-actions class="justify-end">
+                <v-card-actions class="pb-0 justify-end">
                     <v-btn
                         text
                         color="blue darken-1"
@@ -37,18 +37,14 @@
                     </v-btn>
                     <v-btn
                         icon
-                        v-bind="attrs"
-                        v-on="on"
-                        @click="log"
+                        @click="updateProject(item)"
                     >
                     <v-icon color="blue darken-1">
-                        mdi-information-outline
+                        mdi-pencil-outline
                     </v-icon>
                     </v-btn>
                     <v-btn
                         icon
-                        v-bind="attrs"
-                        v-on="on"
                         @click="log"
                     >
                     <v-icon color="blue darken-1">
@@ -64,21 +60,26 @@
 <script>
 export default {
 
+    emits: ['update-project'],
+
     data: () => ({
         items: [
             {
+                id: 1,
                 color: '#1F7087',
                 src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
                 title: 'Supermodel',
                 artist: 'Foster the People',
             },
             {
+                id: 2,
                 color: '#952175',
                 src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
                 title: 'Halcyon Days',
                 artist: 'Ellie Goulding',
             },
             {
+                id: 3,
                 color: '#952175',
                 src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
                 title: 'Halcyon Days',
@@ -96,6 +97,10 @@ export default {
         goToBoard() {
             this.$router.push({ name: 'board' });
         },
+
+        updateProject(item) {
+            this.$emit('update-project', item.id);
+        }
     }
 }
 </script>
@@ -115,7 +120,7 @@ export default {
     background-color: #F6F6F5;
 }
 .before:hover:before {
-    width: 30px;
+    width: 25px;
     transition: 0.2s;  
 }
 </style>

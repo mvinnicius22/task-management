@@ -1,8 +1,21 @@
 <template>
 	<v-container>
-		<v-row class="pt-1">
-			<p class='mt-3 text-gray-500 font-semibold font-sans tracking-wide text-lg'>Projetos / 1 / Board</p>
-			<v-card-actions>
+		<v-row class="mt-1 pl-3">
+			<p class='pt-2 text-gray-500 font-semibold font-sans tracking-wide text-xl'>Projetos / 1 / Board</p>
+			<v-card-actions class="pt-0">
+				<v-btn
+					text
+					color="blue darken-1"
+                    @click="showTask()"
+                >
+                    <v-icon
+                        left
+                        dark
+                    >
+                        mdi-plus
+                        </v-icon>
+					Nova Tarefa
+				</v-btn>
 				<v-btn
 					text
 					color="blue darken-1"
@@ -180,14 +193,18 @@ export default defineComponent({
 		showTaskForm: false,
 	}),
 
+	created() {
+		document.title = "Board";
+	},
+
 	methods: {
 		log(event) {
 			console.log(event);
 		},
 		
-		showTask(id) {
-			this.taskId = id;
+		showTask(id = null) {
 			this.showTaskForm = true;
+			this.taskId = id;
 		},
 
 		goToProjects() {

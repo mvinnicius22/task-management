@@ -9,6 +9,7 @@
                 <v-divider
                     v-if="index < comentarios.length - 1"
                     :key="index"
+                    class="mt-3"
                 ></v-divider>
             </v-list-item>
         </template>

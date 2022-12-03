@@ -9,7 +9,7 @@ const routes = [
 		component: ProjectView,
 	},
 	{
-		path: '/board',
+		path: '/board/:id',
 		name: 'board',
 		component: BoardView
 	},

@@ -28,6 +28,7 @@
                     cols="12"
                 >
                     <v-text-field
+                        v-model="nome"
                         dense
                         label="Nome"
                         hide-details
@@ -49,6 +50,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
+                    :disabled="!nome"
                     text
                     color="blue darken-1"
                     @click="save"
@@ -61,8 +63,11 @@
 </template>
 
 <script>
+import projectApi from '../../assets/js/api/project.js';
 
 export default {
+
+    emits: ['close', 'saved'],
 
     props: {
         projectId: {
@@ -85,15 +90,46 @@ export default {
                 that.close();
             }
         });
+
+        if (this.projectId) {
+            this.fetchProject();
+        }
     },
 
     methods: {
-        close () {
-            this.$emit('close');
+        fetchProject() {
+            projectApi.fetchProject(this.projectId).then(response => {
+                this.nome = response.data.nome;
+                // this.descricao = response.data.descricao;
+            }).catch(error => {
+                console.log(error);
+            });
         },
 
         save () {
-            this.$emit('saved');
+            if (this.projectId) {
+                projectApi.updateProject(this.projectId, {
+                    nome: this.nome,
+                    // descricao: this.descricao,
+                }).then(() => {
+                    this.$emit('saved');
+                }).catch(error => {
+                    console.log(error);
+                });
+            } else {
+                projectApi.createProject({
+                    nome: this.nome,
+                    // descricao: this.descricao,
+                }).then(() => {
+                    this.$emit('saved');
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+        },
+
+        close () {
+            this.$emit('close');
         },
     }
 };

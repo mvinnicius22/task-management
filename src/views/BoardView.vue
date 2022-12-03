@@ -191,10 +191,13 @@ export default defineComponent({
 		],
 		taskId: null,
 		showTaskForm: false,
+		projectId: null,
 	}),
 
 	created() {
 		document.title = "Board";
+		this.projectId = this.$route.params.id;
+        this.log(this.projectId);
 	},
 
 	methods: {

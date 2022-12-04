@@ -86,11 +86,7 @@
         v-model="dialog.show"
         :color="dialog.color"
         :timeout="5000"
-        :text="true"
-        abolute
-        right
-        light
-        tile
+        text
     >
         {{ dialog.message }}
     </v-snackbar>

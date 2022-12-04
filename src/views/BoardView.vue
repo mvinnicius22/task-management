@@ -1,7 +1,7 @@
 <template>
 	<v-container>
 		<v-row class="mt-1 pl-3">
-			<p class='pt-2 text-gray-500 font-semibold font-sans tracking-wide text-xl'>Projetos / 1 / Board</p>
+			<p class='pt-2 text-gray-500 font-semibold font-sans tracking-wide text-xl'>Projetos / {{ projectId }} / Board</p>
 			<v-card-actions class="pt-0">
 				<v-btn
 					text
@@ -26,7 +26,7 @@
 			</v-card-actions>
 		</v-row>
 		<v-divider class="mt-5"></v-divider>
-		<div class="flex justify-center">
+		<div v-if="!loading" class="flex justify-center">
 			<div class="min-h-screen flex overflow-x-scroll py-6">
 				<div
 					v-for="column in columns"
@@ -34,7 +34,15 @@
 					class="px-3 py-3 column-width rounded mr-4"
 				>
 					<p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{column.title}}</p>
-					<draggable :list="column.tasks" item-key="id" :animation="200" ghost-class="ghost-card" group="tasks" @change="log">
+					<draggable
+						:list="column.tasks" 
+						item-key="id" 
+						:animation="200" 
+						ghost-class="ghost-card" 
+						group="tasks" 
+						:emptyInsertThreshold="50"
+						@change="moveTask($event, column.title)"
+					>
 						<template #item="{ element, index }">
 							<task-card
 								:key="index"
@@ -48,18 +56,32 @@
 				</div>
 				<task-form
 					v-if="showTaskForm"
+					:project-id="projectId"
 					:task-id="taskId"
-					@close="showTaskForm = false"
-					@saved="showTaskForm = false"
+					@close="closeTask"
+					@saved="[
+						notify(),
+						closeTask(),
+						fetchTasks(projectId),
+					]"
 				></task-form>
 			</div>
 		</div>
+		<v-snackbar
+			v-model="dialog.show"
+			:color="dialog.color"
+			:timeout="5000"
+			text
+		>
+			{{ dialog.message }}
+		</v-snackbar>
 	</v-container>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import draggable from 'vuedraggable';
+import taskApi from '../assets/js/api/task.js';
 import taskCard from '../components/Card/TaskCard.vue';
 import taskForm from '../components/Form/TaskForm.vue';
 
@@ -76,37 +98,7 @@ export default defineComponent({
 		columns: [
 			{
 				title: "Backlog",
-				tasks: [
-					{
-						id: 1,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					},
-					{
-						id: 2,
-						title: "Provide documentation on integrations",
-						date: "Sep 12"
-					},
-					{
-						id: 3,
-						title: "Design shopping cart dropdown",
-						date: "Sep 9",
-						type: "Design"
-					},
-					{
-						id: 4,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					},
-					{
-						id: 5,
-						title: "Test checkout flow",
-						date: "Sep 15",
-						type: "QA"
-					}
-				]
+				tasks: []
 			},
 			{
 				title: "In Progress",
@@ -189,6 +181,7 @@ export default defineComponent({
 				]
 			}
 		],
+		loading: true,
 		taskId: null,
 		showTaskForm: false,
 		projectId: null,
@@ -197,18 +190,55 @@ export default defineComponent({
 	created() {
 		document.title = "Board";
 		this.projectId = this.$route.params.id;
-        this.log(this.projectId);
+        this.fetchTasks(this.projectId);
 	},
 
 	methods: {
-		log(event) {
-			console.log(event);
+		fetchTasks(projectId) {
+            this.loading = true;
+            taskApi.fetchTasks(projectId).then((response) => {
+				this.columns.forEach((column) => {
+					// if (column.title != "Backlog" && column.title != "In Progress") {
+					// 	column.tasks = [];
+					// }
+					column.tasks = [];
+				});
+				response.data.forEach((task) => {
+					if (! task.status) task.status = 'Backlog';
+					this.columns.findIndex((column) => {
+						if (column.title === task.status) {
+							column.tasks.push(task);
+						}
+					});
+				});
+            }).finally(() => {
+                this.loading = false;
+            });
+        },
+
+		moveTask(event, status) {
+			if (! event.added) return;
+			taskApi.updateTask(event.added.element.id, { descricao: status }).then(() => {
+				this.notify('Tarefa movida com sucesso!', 'success');
+			}).catch(() => {
+				this.notify('Error moving task', 'error');
+			}).finally(() => {
+				this.fetchTasks(this.projectId);
+			});
 		},
 		
 		showTask(id = null) {
 			this.showTaskForm = true;
 			this.taskId = id;
 		},
+
+		closeTask() {
+            this.showTaskForm = false;
+        },
+
+        notify(message = null, color = 'success') {
+            this.alertSuccess(message || 'Operação realizada com sucesso!', color);
+        },
 
 		goToProjects() {
 			this.$router.push({ name: 'projects' });

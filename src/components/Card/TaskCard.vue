@@ -1,7 +1,7 @@
 <template>
     <div class='bg-white shadow rounded px-3 pt-3 pb-5 border border-white'>
         <div class='flex justify-between'>
-            <p class='text-gray-700 font-semibold font-sans tracking-wide text-sm'>{{task.title}}</p>
+            <p class='text-gray-700 font-semibold font-sans tracking-wide text-sm'>{{ task.id }} - {{task.titulo}}</p>
 
             <img
                 class='w-6 h-6 rounded-full ml-3'
@@ -10,8 +10,8 @@
             >
         </div>
         <div class='flex mt-4 justify-between items-center'>
-            <span class='text-sm text-gray-600'>{{task.date}}</span>
-            <badge-card v-if='task.type' :color='badgeColor'>{{task.type}}</badge-card>
+            <span class='text-sm text-gray-600'>{{task.descricao}}</span>
+            <badge-card v-if='task.status' :color='badgeColor'>{{task.status}}</badge-card>
         </div>
     </div>
 </template>
@@ -40,7 +40,7 @@ export default {
                 QA: 'green',
                 default: 'teal'
             };
-            return mappings[this.task.type] || mappings.default;
+            return mappings[this.task.status] || mappings.default;
         }
     }
 };

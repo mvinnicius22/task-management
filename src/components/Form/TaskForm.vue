@@ -30,11 +30,12 @@
                     md="3"
                 >
                     <v-text-field
-                        dense
+                        v-model="task.titulo"
                         label="Título"
                         hide-details
                         single-line
                         required
+                        dense
                     ></v-text-field>
                 </v-col>
                 <v-col
@@ -45,8 +46,9 @@
                     <v-autocomplete
                         dense
                         filled
+                        disabled
                         :items="responsaveis"
-                        v-model="responsavelId"
+                        v-model="task.responsavelId"
                         hint="atribua o responsável pela tarefa"
                         no-data-text="Nenhum responsável encontrado"
                         label="Responsável"
@@ -63,8 +65,9 @@
                     <v-autocomplete
                         dense
                         filled
+                        disabled
                         :items="relatores"
-                        v-model="relatorId"
+                        v-model="task.relatorId"
                         hint="escolha um relator para acompanhar a tarefa"
                         no-data-text="Nehum relator encontrado"
                         label="Relator"
@@ -82,7 +85,7 @@
                         dense
                         filled
                         :items="prioridades"
-                        v-model="prioridadeId"
+                        v-model="task.prioridade"
                         label="Prioridade"
                         hide-details
                         single-line
@@ -95,7 +98,7 @@
                         auto-grow
                         hide-details
                         label="Descrição"
-                        v-model="descricao"
+                        v-model="task.descricao"
                     ></v-textarea>
                 </v-col>
             </v-row>
@@ -174,6 +177,7 @@
 </template>
 
 <script>
+import taskApi from '../../assets/js/api/task.js';
 import commentList from '../List/CommentList.vue';
 
 export default {
@@ -186,18 +190,30 @@ export default {
 		taskId: {
 			type: Number,
 			default: 0,
-		}
+		},
+
+        projectId: {
+			type: Number,
+			default: 0,
+		},
 	},
 
     data: () => ({
         dialog: true,
         relatores: [],
-        relatorId: null,
         responsaveis: [],
-        responsavelId: null,
-        prioridades: [],
-        prioridadeId: null,
-        descricao: "The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through.",
+        prioridades: [
+            'Baixa',
+            'Média',
+            'Alta',
+        ],
+        task: {
+            titulo: null,
+            descricao: null,
+            prioridade: null,
+            responsavelId: null,
+            relatorId: null,
+        },
         showCommentField: false,
         comentario: null,
     }),
@@ -210,17 +226,42 @@ export default {
                 that.close();
             }
         });
+
+        if (this.taskId) {
+            this.fetchTask();
+        }
     },
 
     methods: {
-        close () {
-            this.$emit('close');
+        fetchTask() {
+            taskApi.fetchTask(this.taskId).then(response => {
+                this.task = {
+                    ...this.task,
+                    ...response.data
+                };
+            }).catch(error => {
+                console.log(error);
+            });
         },
 
         save () {
-            this.$emit('saved', {
-                id: this.taskId,
-            });
+            if (this.taskId) {
+                taskApi.updateTask(this.taskId, this.task).then(() => {
+                    this.$emit('saved');
+                }).catch(error => {
+                    console.log(error);
+                });
+            } else {
+                taskApi.createTask(this.projectId, this.task).then(() => {
+                    this.$emit('saved');
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+        },
+
+        close () {
+            this.$emit('close');
         },
 
         toggleCommentField() {

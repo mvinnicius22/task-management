@@ -13,10 +13,22 @@ export default {
     },
 
     createTask(projectId, task) {
+        if (task.data) {
+            task.data = task.data.split('-');
+            task.data = `${task.data[1]}/${task.data[2]}/${task.data[0]}`;
+        }
         return axios.post(`${baseEndpoint}/${projectId}/${endpoint}`, task);
     },
 
+    updateTaskStatus(id, status) {
+        return axios.put(`${endpoint}/${id}/status`, { status });
+    },
+
     updateTask(id, task) {
+        if (task.data) {
+            task.data = task.data.split('-');
+            task.data = `${task.data[1]}/${task.data[2]}/${task.data[0]}`;
+        }
         return axios.put(`${endpoint}/${id}`, task);
     },
 

@@ -100,7 +100,7 @@ export default {
         fetchProject() {
             projectApi.fetchProject(this.projectId).then(response => {
                 this.nome = response.data.nome;
-                // this.descricao = response.data.descricao;
+                this.descricao = response.data.descricao;
             }).catch(error => {
                 console.log(error);
             });
@@ -110,7 +110,7 @@ export default {
             if (this.projectId) {
                 projectApi.updateProject(this.projectId, {
                     nome: this.nome,
-                    // descricao: this.descricao,
+                    descricao: this.descricao,
                 }).then(() => {
                     this.$emit('saved');
                 }).catch(error => {
@@ -119,7 +119,7 @@ export default {
             } else {
                 projectApi.createProject({
                     nome: this.nome,
-                    // descricao: this.descricao,
+                    descricao: this.descricao,
                 }).then(() => {
                     this.$emit('saved');
                 }).catch(error => {

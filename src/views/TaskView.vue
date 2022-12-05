@@ -31,7 +31,7 @@
 				<div
 					v-for="column in columns"
 					:key="column.title"
-					class="px-3 py-3 column-width rounded mr-4"
+					class="px-3 py-3 column-width rounded"
 				>
 					<p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{column.title}}</p>
 					<draggable
@@ -40,7 +40,7 @@
 						:animation="200" 
 						ghost-class="ghost-card" 
 						group="tasks" 
-						:emptyInsertThreshold="50"
+						:emptyInsertThreshold="100"
 						@change="moveTask($event, column.title)"
 					>
 						<template #item="{ element, index }">
@@ -84,6 +84,7 @@ import draggable from 'vuedraggable';
 import taskApi from '../assets/js/api/task.js';
 import taskCard from '../components/Card/TaskCard.vue';
 import taskForm from '../components/Form/TaskForm.vue';
+import statusesMixin from '../assets/js/mixins/statuses.js';
 
 export default defineComponent({
 	name: 'BoardView',
@@ -94,93 +95,12 @@ export default defineComponent({
 		taskForm,
 	},
 
+	mixins: [
+		statusesMixin,
+	],
+
 	data: () => ({
-		columns: [
-			{
-				title: "Backlog",
-				tasks: []
-			},
-			{
-				title: "In Progress",
-				tasks: [
-					{
-						id: 6,
-						title: "Design shopping cart dropdown",
-						date: "Sep 9",
-						type: "Design"
-					},
-					{
-						id: 7,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					},
-					{
-						id: 8,
-						title: "Provide documentation on integrations",
-						date: "Sep 12",
-						type: "Backend"
-				}
-				]
-			},
-			{
-				title: "Review",
-				tasks: [
-					{
-						id: 9,
-						title: "Provide documentation on integrations",
-						date: "Sep 12"
-					},
-					{
-						id: 10,
-						title: "Design shopping cart dropdown",
-						date: "Sep 9",
-						type: "Design"
-					},
-					{
-						id: 11,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					},
-					{
-						id: 12,
-						title: "Design shopping cart dropdown",
-						date: "Sep 9",
-						type: "Design"
-					},
-					{
-						id: 13,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					}
-				]
-			},
-			{
-				title: "Done",
-				tasks: [
-					{
-						id: 14,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					},
-					{
-						id: 15,
-						title: "Design shopping cart dropdown",
-						date: "Sep 9",
-						type: "Design"
-					},
-					{
-						id: 16,
-						title: "Add discount code to checkout page",
-						date: "Sep 14",
-						type: "Feature Request"
-					}
-				]
-			}
-		],
+		columns: [],
 		loading: true,
 		taskId: null,
 		showTaskForm: false,
@@ -190,17 +110,24 @@ export default defineComponent({
 	created() {
 		document.title = "Board";
 		this.projectId = this.$route.params.id;
+		this.fetchStatuses();
         this.fetchTasks(this.projectId);
 	},
 
 	methods: {
+		fetchStatuses() {
+			this.statuses.forEach((status) => {
+				this.columns.push({
+					title: status,
+					tasks: []
+				});
+			});
+		},
+
 		fetchTasks(projectId) {
             this.loading = true;
             taskApi.fetchTasks(projectId).then((response) => {
 				this.columns.forEach((column) => {
-					// if (column.title != "Backlog" && column.title != "In Progress") {
-					// 	column.tasks = [];
-					// }
 					column.tasks = [];
 				});
 				response.data.forEach((task) => {
@@ -218,7 +145,7 @@ export default defineComponent({
 
 		moveTask(event, status) {
 			if (! event.added) return;
-			taskApi.updateTask(event.added.element.id, { descricao: status }).then(() => {
+			taskApi.updateTaskStatus(event.added.element.id, status).then(() => {
 				this.notify('Tarefa movida com sucesso!', 'success');
 			}).catch(() => {
 				this.notify('Error moving task', 'error');
@@ -249,8 +176,8 @@ export default defineComponent({
 
 <style scoped>
 .column-width {
-	min-width: 320px;
-	width: 320px;
+	min-width: 270px;
+	width: 270px;
 }
 /* Unfortunately @apply cannot be setup in codesandbox, 
 but you'd use "@apply border opacity-50 border-blue-500 bg-gray-200" here */

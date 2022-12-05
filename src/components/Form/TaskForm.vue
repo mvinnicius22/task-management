@@ -43,19 +43,15 @@
                     sm="6"
                     md="3"
                 >
-                    <v-autocomplete
-                        dense
-                        filled
-                        disabled
-                        :items="responsaveis"
-                        v-model="task.responsavelId"
-                        hint="atribua o responsável pela tarefa"
-                        no-data-text="Nenhum responsável encontrado"
-                        label="Responsável"
-                        persistent-hint
+                    <v-text-field
+                        v-model="task.data"
+                        label="Data"
+                        type="date"
                         hide-details
                         single-line
-                    ></v-autocomplete>
+                        required
+                        dense
+                    ></v-text-field>
                 </v-col>
                 <v-col
                     cols="12"
@@ -65,13 +61,9 @@
                     <v-autocomplete
                         dense
                         filled
-                        disabled
-                        :items="relatores"
-                        v-model="task.relatorId"
-                        hint="escolha um relator para acompanhar a tarefa"
-                        no-data-text="Nehum relator encontrado"
-                        label="Relator"
-                        persistent-hint
+                        :items="statuses"
+                        v-model="task.status"
+                        label="Status"
                         hide-details
                         single-line
                     ></v-autocomplete>
@@ -116,61 +108,7 @@
 
             <template v-if="taskId">
                 <v-divider></v-divider>
-
-                <v-row v-if="showCommentField" class="pt-3 pb-0 pl-3 pr-3">
-                    <v-col cols="12">
-                        <v-textarea
-                            filled
-                            rows="2"
-                            auto-grow
-                            label="Adicionar comentário"
-                            v-model="comentario"
-                            hide-details
-                        ></v-textarea>        
-                    </v-col>
-                </v-row>
-
-                <v-card-actions v-if="showCommentField">
-                <v-spacer></v-spacer>
-                    <v-btn
-                        text
-                        color="grey"
-                        @click="toggleCommentField"
-                    >
-                        Cancelar
-                    </v-btn>
-                    <v-btn
-                        text
-                        color="blue darken-1"
-                        @click="saveComment"
-                    >
-                        Postar
-                    </v-btn>
-                </v-card-actions>
-
-                <v-row class="p-3 pb-0">
-                    <div class="pl-3 pr-3 py-2">
-                        <p class='text-gray-700 font-semibold font-sans tracking-wide text-lg'>Comentários</p>
-                    </div>
-                    <v-spacer></v-spacer>
-                    <v-card-actions v-if="!showCommentField">
-                        <v-btn
-                            text
-                            color="blue darken-1"
-                            @click="toggleCommentField"
-                        >
-                            <v-icon
-                                left
-                                dark
-                            >
-                                mdi-plus
-                            </v-icon>
-                            Novo comentário
-                        </v-btn>
-                    </v-card-actions>
-                </v-row>
-
-                <comment-list />
+                <comment-list :task-id="taskId" />
             </template>
         </v-card>
     </v-dialog>
@@ -178,6 +116,7 @@
 
 <script>
 import taskApi from '../../assets/js/api/task.js';
+import statusesMixin from '../../assets/js/mixins/statuses.js';
 import commentList from '../List/CommentList.vue';
 
 export default {
@@ -186,6 +125,10 @@ export default {
         commentList,
     },
 
+    mixins: [
+        statusesMixin,
+    ],
+
 	props: {
 		taskId: {
 			type: Number,
@@ -193,15 +136,13 @@ export default {
 		},
 
         projectId: {
-			type: Number,
+			type: [Number, String],
 			default: 0,
 		},
 	},
 
     data: () => ({
         dialog: true,
-        relatores: [],
-        responsaveis: [],
         prioridades: [
             'Baixa',
             'Média',
@@ -211,11 +152,9 @@ export default {
             titulo: null,
             descricao: null,
             prioridade: null,
-            responsavelId: null,
-            relatorId: null,
+            data: null,
+            status: null,
         },
-        showCommentField: false,
-        comentario: null,
     }),
 
     created() {
@@ -239,12 +178,14 @@ export default {
                     ...this.task,
                     ...response.data
                 };
+                var dateFormatting = this.task.data.split('/');
+                this.task.data = (`${dateFormatting[2]}/${dateFormatting[0]}/${dateFormatting[1]}`).replaceAll('/', '-');
             }).catch(error => {
                 console.log(error);
             });
         },
 
-        save () {
+        save() {
             if (this.taskId) {
                 taskApi.updateTask(this.taskId, this.task).then(() => {
                     this.$emit('saved');
@@ -260,16 +201,8 @@ export default {
             }
         },
 
-        close () {
+        close() {
             this.$emit('close');
-        },
-
-        toggleCommentField() {
-            this.showCommentField = !this.showCommentField;
-        },
-
-        saveComment(event) {
-            console.log(event);
         },
     }
 };

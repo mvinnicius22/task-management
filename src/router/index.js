@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import BoardView from '../views/BoardView.vue';
+import TaskView from '../views/TaskView.vue';
 import ProjectView from '../views/ProjectView.vue';
 
 const routes = [
@@ -11,7 +11,7 @@ const routes = [
 	{
 		path: '/board/:id',
 		name: 'board',
-		component: BoardView
+		component: TaskView
 	},
 ]
 

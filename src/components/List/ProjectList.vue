@@ -39,9 +39,9 @@
                     </v-col>
                     <v-col cols="9">
                         <p class='ma-0 text-gray-700 font-semibold font-sans tracking-wide text-lg'>{{ item.nome }}</p>
-                        <span class='pb-0 ma-0 text-sm text-gray-600'>{{ item.nome }}</span>
+                        <span class='pb-0 ma-0 text-sm text-gray-600'>{{ item.descricao }}</span>
                         <br />
-                        <span class='ma-0 text-sm text-gray-600'>{{ item.nome }}</span>
+                        <span class='ma-0 text-sm text-gray-600'># {{ item.id }}</span>
                     </v-col>
                 </v-row>
                 <v-card-actions class="pb-0 justify-end">
@@ -56,16 +56,17 @@
                         icon
                         @click="showProject(item.id)"
                     >
-                    <v-icon color="blue darken-1">
+                    <v-icon color="grey lighten-1">
                         mdi-pencil-outline
                     </v-icon>
                     </v-btn>
                     <v-btn
+                        class="mr-2 ml-0"
                         icon
                         @click="deleteProject(item.id)"
                     >
-                    <v-icon color="blue darken-1">
-                        mdi-delete
+                    <v-icon color="grey lighten-1">
+                        mdi-delete-outline
                     </v-icon>
                     </v-btn>
                 </v-card-actions>

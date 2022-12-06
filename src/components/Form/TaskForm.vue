@@ -178,8 +178,10 @@ export default {
                     ...this.task,
                     ...response.data
                 };
-                var dateFormatting = this.task.data.split('/');
-                this.task.data = (`${dateFormatting[2]}/${dateFormatting[0]}/${dateFormatting[1]}`).replaceAll('/', '-');
+                if (this.task.data) {
+                    var dateFormatting = this.task.data.split('/');
+                    this.task.data = (`${dateFormatting[2]}/${dateFormatting[0]}/${dateFormatting[1]}`).replaceAll('/', '-');
+                }
             }).catch(error => {
                 console.log(error);
             });

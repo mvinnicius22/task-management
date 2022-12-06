@@ -16,7 +16,7 @@
                 </v-icon>
                 <span v-if="!isTaskDone" class='ml-2 text-sm text-gray-600'>{{ task.prioridade }}</span>
             </div>
-            <badge-card v-if='task.status' :color='badgeColor'>
+            <badge-card v-if="task.status" :color="badgeColor(task)">
                 <s v-if="isTaskDone">
                     {{ task.status }}
                 </s>
@@ -31,6 +31,7 @@
 <script>
 import statusesMixin from '../../assets/js/mixins/statuses.js';
 import badgeCard from '../Card/BadgeCard.vue';
+
 export default {
 
     components: {
@@ -44,12 +45,13 @@ export default {
     props: {
         task: {
             type: Object,
-                default: () => ({})
-            }
+            default: () => ({})
+        },
     },
 
     computed: {
         formattedDate() {
+            if (! this.task.data) return null;
             var dateFormatting = this.task.data.split('/');
             return (`${dateFormatting[1]}/${dateFormatting[0]}/${dateFormatting[2]}`);
         },

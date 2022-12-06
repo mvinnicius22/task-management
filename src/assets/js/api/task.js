@@ -4,6 +4,10 @@ const baseEndpoint = 'projetos';
 const endpoint = 'tarefas';
 
 export default {
+    fetchAllTasks() {
+        return axios.get(`${endpoint}`);
+    },
+
     fetchTasks(projectId) {
         return axios.get(`${baseEndpoint}/${projectId}/${endpoint}`);
     },

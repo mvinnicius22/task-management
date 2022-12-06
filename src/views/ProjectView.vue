@@ -6,11 +6,11 @@
 
         <v-divider class="mt-9"></v-divider>
 
-        <project-list />
+        <project-list @reload="reloadData()"/>
 
         <v-divider class="mt-6"></v-divider>
 
-        <task-list />
+        <task-list :key="key" />
     </v-container>
 </template>
 
@@ -27,8 +27,18 @@ export default defineComponent({
         taskList,
     },
 
+    data: () => ({
+        key: 0,
+    }),
+
     created() {
 		document.title = "Projects";
 	},
+
+    methods: {
+        reloadData() {
+            this.key++;
+        },
+    },
 });
 </script>

@@ -10,8 +10,8 @@ export default {
         ],
     }),
 
-    computed: {
-        badgeColor() {
+    methods: {
+        badgeColor(item) {
             const mappings = {
                 Backlog: 'purple', 
                 'Em andamento': 'teal',
@@ -21,8 +21,7 @@ export default {
                 Concluida: 'gray',
                 default: 'aqua'
             };
-            return mappings[this.task.status] || mappings.default;
+            return mappings[item.status] || mappings.default;
         },
     },
-
 }
